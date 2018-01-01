@@ -20,6 +20,7 @@ func TestDajarep(t *testing.T) {
 イカは如何なものか
 親譲りの無鉄砲で子供の時から損ばかりしている
 マイケル・ジョーダンが冗談を言った
+景気のいいケーキ
 知事が縮む`
 	ans := `アルミ缶の上にあるミカン
 智代子のチョコ
@@ -29,6 +30,7 @@ func TestDajarep(t *testing.T) {
 傘を貸さない
 イカは如何なものか
 マイケル・ジョーダンが冗談を言った
+景気のいいケーキ
 知事が縮む`
 	d, _ := Dajarep(input)
 	res := strings.Join(d, "\n")
