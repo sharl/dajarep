@@ -1,6 +1,7 @@
 package dajarep
 
 import (
+	"fmt"
 	"math"
 	"regexp"
 	"strings"
@@ -27,10 +28,10 @@ type sentence struct {
 }
 
 //Dajarep :駄洒落を返す
-func Dajarep(text string) (dajares []string, debugStrs []string) {
+func Dajarep(text string, debug bool) (dajares []string, debugStrs []string) {
 	sentences := getSentences(text)
 	for i := 0; i < len(sentences); i++ {
-		if ok, kana := isDajare(sentences[i]); ok == true {
+		if ok, kana := isDajare(sentences[i], debug); ok == true {
 			dajares = append(dajares, sentences[i].str)
 			debugStrs = append(debugStrs, kana)
 		}
@@ -39,10 +40,13 @@ func Dajarep(text string) (dajares []string, debugStrs []string) {
 }
 
 //駄洒落かどうかを評価する。
-func isDajare(sen sentence) (bool, string) {
+func isDajare(sen sentence, debug bool) (bool, string) {
 	words := sen.words
 	for i := 0; i < len(words); i++ {
 		w := words[i]
+		if debug {
+			fmt.Println(w)
+		}
 		if w.wtype == "名詞" && len([]rune(w.kana)) > 1 {
 			rStr := regexp.MustCompile(w.str)
 			rKana := regexp.MustCompile(fixWord(w.kana))
@@ -50,6 +54,9 @@ func isDajare(sen sentence) (bool, string) {
 			hitKana := rKana.FindAllString(sen.kana, -1)
 			hitKana2 := rKana.FindAllString(fixSentence(sen.kana), -1)
 			//ある単語における　原文の一致文字列数<フリガナでの一致文字列数　→　駄洒落の読みが存在
+			if debug {
+				fmt.Println(rKana, len(hitStr), sen.kana, len(hitKana), fixSentence(sen.kana), len(hitKana2))
+			}
 			if len(hitStr) > 0 && len(hitStr) < int(math.Max(float64(len(hitKana)), float64(len(hitKana2)))) {
 				return true, w.kana
 			}
