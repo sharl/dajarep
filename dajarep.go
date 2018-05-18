@@ -2,6 +2,7 @@ package dajarep
 
 import (
 	"fmt"
+	"unicode"
 	"math"
 	"regexp"
 	"strings"
@@ -131,6 +132,20 @@ func getSentences(text string) []sentence {
 	var sentences []sentence
 	t := tokenizer.New()
 
+	// http://www.serendip.ws/archives/6307
+	kanaConv := unicode.SpecialCase {
+		// ひらがなをカタカナに変換
+		unicode.CaseRange{
+			0x3041, // Lo: ぁ
+			0x3093, // Hi: ん
+			[unicode.MaxCase]rune{
+				0x30a1 - 0x3041, // UpperCase でカタカナに変換
+				0,               // LowerCase では変換しない
+				0x30a1 - 0x3041, // TitleCase でカタカナに変換
+			},
+		},
+	}
+
 	text = strings.Replace(text, "。", "\n", -1)
 	text = strings.Replace(text, ".", "\n", -1)
 	text = strings.Replace(text, "?", "?\n", -1)
@@ -153,6 +168,14 @@ func getSentences(text string) []sentence {
 				}
 				words = append(words, w)
 				kana += ft[7]
+			} else if len(ft) == 7 {
+				lk := strings.ToUpperSpecial(kanaConv, tk.Surface)
+				w := word{str: lk,
+					kana: lk,
+					wtype: ft[0],
+				}
+				words = append(words, w)
+				kana += lk
 			}
 		}
 		sentences = append(sentences,
